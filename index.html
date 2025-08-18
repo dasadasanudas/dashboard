@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Tab</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="desktop">
+        <div class="screen" id="screen-1"></div>
+    </div>
+    <div id="dock">
+        <div class="dock-item" data-url="https://www.google.com">
+            <img src="https://www.google.com/s2/favicons?sz=64&domain=google.com" alt="Google">
+            <span>Google</span>
+        </div>
+    </div>
+
+    <div id="screen-indicator"></div>
+
+    <div id="context-menu" class="hidden">
+        <div class="context-menu-item" id="add-bookmark">Add Bookmark</div>
+        <div class="context-menu-item" id="add-folder">Add Folder</div>
+    </div>
+
+    <div id="folder-view" class="hidden">
+        <div id="folder-back-btn">&lt; Back</div>
+        <div id="folder-name"></div>
+        <div id="folder-grid"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
