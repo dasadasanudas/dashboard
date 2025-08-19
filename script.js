@@ -16,6 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let dragTarget = null;
     let dragOffsetX, dragOffsetY;
     let jiggleModeActive = false;
+    let animationFrameId;
+    let latestMouseX, latestMouseY;
     let isSwiping = false;
     let swipeStartX = 0;
     let currentScreenIndex = 0;
@@ -142,12 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.button !== 0) return; // Only left-click
 
             if (jiggleModeActive) {
-                isDragging = true;
-                dragTarget = icon;
-                dragTarget.classList.add('dragging');
-                const rect = dragTarget.getBoundingClientRect();
-                dragOffsetX = e.clientX - rect.left;
-                dragOffsetY = e.clientY - rect.top;
+                startDrag(e, icon);
                 return;
             }
 
@@ -156,11 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 longPressTimer = null;
             }, 500);
 
-            isDragging = true;
-            dragTarget = icon;
-            const rect = dragTarget.getBoundingClientRect();
-            dragOffsetX = e.clientX - rect.left;
-            dragOffsetY = e.clientY - rect.top;
+            startDrag(e, icon);
         });
 
         icon.addEventListener('click', (e) => {
@@ -193,10 +186,42 @@ document.addEventListener('DOMContentLoaded', () => {
         startY = e.clientY;
     });
 
+    function startDrag(e, icon) {
+        isDragging = true;
+        dragTarget = icon;
+        dragTarget.classList.add('dragging');
+        const rect = dragTarget.getBoundingClientRect();
+        dragOffsetX = e.clientX - rect.left;
+        dragOffsetY = e.clientY - rect.top;
+        latestMouseX = e.clientX;
+        latestMouseY = e.clientY;
+
+        dragTarget.style.transition = 'none';
+
+        animationFrameId = requestAnimationFrame(dragUpdate);
+    }
+
+    function dragUpdate() {
+        if (!isDragging) return;
+
+        let newX = latestMouseX - dragOffsetX;
+        let newY = latestMouseY - dragOffsetY;
+
+        dragTarget.style.left = `${newX}px`;
+        dragTarget.style.top = `${newY}px`;
+
+        animationFrameId = requestAnimationFrame(dragUpdate);
+    }
+
     desktop.addEventListener('mousemove', (e) => {
         if(isSwiping) {
             const diffX = e.clientX - swipeStartX;
             desktop.style.transform = `translateX(${-currentScreenIndex * window.innerWidth + diffX}px)`;
+        }
+
+        if (isDragging) {
+            latestMouseX = e.clientX;
+            latestMouseY = e.clientY;
         }
 
         if (isDragging && dragTarget) {
@@ -216,18 +241,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (longPressTimer && (Math.abs(e.clientX - startX) > 5 || Math.abs(e.clientY - startY) > 5)) {
             clearTimeout(longPressTimer);
             longPressTimer = null;
-        }
-
-        if (isDragging && dragTarget) {
-            if (!dragTarget.classList.contains('dragging')) {
-                 dragTarget.classList.add('dragging');
-            }
-            e.preventDefault();
-            let newX = e.clientX - dragOffsetX;
-            let newY = e.clientY - dragOffsetY;
-
-            dragTarget.style.left = `${newX}px`;
-            dragTarget.style.top = `${newY}px`;
         }
     });
 
@@ -250,6 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
         longPressTimer = null;
 
         if (isDragging && dragTarget) {
+            cancelAnimationFrame(animationFrameId);
             dragTarget.classList.remove('dragging');
 
             const dropTarget = getDropTarget(e.clientX, e.clientY, dragTarget);
@@ -271,8 +285,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 const gridSize = 100;
                 const x = Math.round(parseInt(dragTarget.style.left) / gridSize) * gridSize + 20;
                 const y = Math.round(parseInt(dragTarget.style.top) / gridSize) * gridSize + 20;
+
+                dragTarget.style.transition = 'top 0.2s ease-in-out, left 0.2s ease-in-out';
                 dragTarget.style.left = `${x}px`;
                 dragTarget.style.top = `${y}px`;
+
+                setTimeout(() => {
+                    if(dragTarget) {
+                        dragTarget.style.transition = '';
+                    }
+                }, 200);
             }
 
             isDragging = false;

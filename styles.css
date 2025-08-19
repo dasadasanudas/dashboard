@@ -14,9 +14,6 @@ body {
     color: var(--text-color);
     margin: 0;
     overflow: hidden;
-    background-image: url('https://source.unsplash.com/random/1920x1080?nature');
-    background-size: cover;
-    background-position: center;
 }
 
 #desktop {
@@ -61,9 +58,13 @@ body {
     align-items: center;
     justify-content: center;
     text-decoration: none;
-    color: white;
     font-size: 12px;
     text-align: center;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.dock-item {
+    color: white;
 }
 
 .dock-item img, .app-icon img {
@@ -81,6 +82,10 @@ body {
     max-width: 100%;
 }
 
+.screen .app-icon span {
+    color: black;
+}
+
 .folder-emoji {
     font-size: 48px;
     line-height: 48px;
@@ -92,7 +97,7 @@ body {
     background-color: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border-radius: 8px;
+    border-radius: var(--border-radius);
     box-shadow: 0 2px 10px rgba(0,0,0,0.2);
     padding: 5px;
     z-index: 1000;
@@ -115,14 +120,15 @@ body {
 
 .app-icon {
     position: absolute;
-    color: black;
     cursor: grab;
 }
 
 .app-icon.dragging {
-    opacity: 0.5;
+    opacity: 0.8;
     cursor: grabbing;
     z-index: 100;
+    transform: scale(1.1);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
 }
 
 .app-icon.jiggle {
@@ -182,9 +188,7 @@ body {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background-color: var(--secondary-color);
     z-index: 2000;
     padding: 20px;
     box-sizing: border-box;
